@@ -1,7 +1,16 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Newtonsoft.Json;
+using System.Reflection;
+using WebAPI_dapper.Resources;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,11 +23,81 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
 });
 
+// tich hop da ngon ngu
+
+var supportedCultures = new[]
+{
+    new CultureInfo("en-US"),
+    new CultureInfo("vi-VN"),
+};
+
+var options = new RequestLocalizationOptions()
+{
+    DefaultRequestCulture = new RequestCulture(culture: "vi-VN", uiCulture: "vi-VN"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+
+options.RequestCultureProviders = new[]
+{
+    new RouteDataRequestCultureProvider(){Options = options }
+};
+
+builder.Services.AddSingleton(options);
+builder.Services.AddSingleton<LocalService>();
+
+builder.Services.AddLocalization(opt => opt.ResourcesPath = "Resources");
+
+builder.Services.AddMvc()
+    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization(
+    opt =>
+    {
+        opt.DataAnnotationLocalizerProvider = (type, factory) =>
+        {
+            var assemblyName = new AssemblyName(typeof(SharedResource).GetTypeInfo().Assembly.FullName);
+            return factory.Create("SharedResource", assemblyName.Name);
+        };
+    }
+);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+var loggerFactory = app.Services.GetService<ILoggerFactory>();
+
+    loggerFactory.AddFile(builder.Configuration.GetSection("Logging"));
+
+
+var locOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(locOptions.Value);
+
+app.UseExceptionHandler(options =>
+{
+    options.Run(async context =>
+    {
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        var ex = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+        if (ex == null) return;
+
+        var error = new
+        {
+            message = ex.Message
+        };
+        context.Response.ContentType = "application/json";
+        context.Response.Headers.Add("Access-Control-Allow-Credentials", new[] { "true" });
+        context.Response.Headers.Add("Access-Control-Allow-Origin", new[] { builder.Configuration["AllowedHosts"] });
+
+        using (var writer = new StreamWriter(context.Response.Body))
+        {
+            new Newtonsoft.Json.JsonSerializer().Serialize(writer, error);
+            await writer.FlushAsync().ConfigureAwait(false);
+        }
+    });
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -29,6 +108,7 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json","Learn WebAPI_dapper v1");
     });
 }
+
 
 app.UseHttpsRedirection();
 
