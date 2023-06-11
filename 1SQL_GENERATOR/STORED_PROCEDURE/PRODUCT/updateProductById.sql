@@ -23,8 +23,8 @@ ALTER PROCEDURE [dbo].[Edit_Product]
 @sku varchar(50),
 @isActice bit,
 @language varchar(50),
-@imageUrl nvarchar(255)
-
+@imageUrl nvarchar(255),
+@categoryIds varchar(50)
 AS
 BEGIN
 
@@ -49,6 +49,10 @@ BEGIN
 				SeoTitle = @seoTitle
 			WHERE ProductId = @id AND LanguageId = @language
 
+			DELETE FROM ProductInCategories WHERE ProductId = @id
+
+			INSERT INTO ProductInCategories
+			SELECT @id as ProductId, CAST(String as INT) as CategoryId from ufn_CSVToTable(@categoryIds,',')
 			COMMIT
 		END TRY
 		BEGIN CATCH 

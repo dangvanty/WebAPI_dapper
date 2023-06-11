@@ -1,6 +1,6 @@
 ﻿USE [RestApiAdapper]
 GO
-/****** Object:  StoredProcedure [dbo].[Find_Product_By_Id]    Script Date: 10/6/2023 6:43:18 PM ******/
+/****** Object:  StoredProcedure [dbo].[Find_Product_By_Id]    Script Date: 11/6/2023 9:44:53 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -35,6 +35,6 @@ BEGIN
 		pt.SeoTitle,
 		pt.LanguageId
     FROM Products p INNER JOIN ProductTranslations pt
-	ON p.Id = pt.ProductId
-	WHERE Id = @id
+		ON p.Id = pt.ProductId
+	WHERE p.Id = @id
 END

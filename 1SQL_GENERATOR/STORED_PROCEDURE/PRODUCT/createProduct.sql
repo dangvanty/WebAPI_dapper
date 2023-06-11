@@ -1,6 +1,6 @@
 ﻿USE [RestApiAdapper]
 GO
-/****** Object:  StoredProcedure [dbo].[Create_Product]    Script Date: 11/6/2023 1:00:32 AM ******/
+/****** Object:  StoredProcedure [dbo].[Create_Product]    Script Date: 11/6/2023 9:44:38 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -24,6 +24,7 @@ ALTER PROCEDURE [dbo].[Create_Product]
 @imageUrl nvarchar(255),
 @imageList nvarchar(Max),
 @language varchar(50),
+@categoryIds varchar(50),
 @id int output
 AS
 BEGIN
@@ -39,6 +40,10 @@ BEGIN
 			INSERT INTO ProductTranslations(ProductId,LanguageId,Name,Content,Description,SeoDescription,SeoAlias,SeoKeyword,SeoTitle)
 			VALUES (@id,@language,@name,@content,@description,@seoDescription,@seoAlias,@seoKeyword,@seoTitle)
 
+			DELETE FROM ProductInCategories WHERE ProductId = @id
+
+			INSERT INTO ProductInCategories
+			SELECT @id as ProductId, CAST(String as INT) as CategoryId from ufn_CSVToTable(@categoryIds,',')
 			COMMIT
 		END TRY
 		BEGIN CATCH 

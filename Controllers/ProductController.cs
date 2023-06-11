@@ -146,6 +146,7 @@ namespace WebAPI_dapper.Controllers
                 paramaters.Add("@imageUrl", product.ImageUrl);
                 paramaters.Add("@imageList", product.ImageList);
                 paramaters.Add("@language", CultureInfo.CurrentCulture.Name);
+                paramaters.Add("@categoryIds", product.CategoryIds);
                 paramaters.Add("@id", dbType: System.Data.DbType.Int32, direction: System.Data.ParameterDirection.Output);
 
                 string createProduct = "Create_Product";
@@ -187,6 +188,7 @@ namespace WebAPI_dapper.Controllers
                 paramaters.Add("@imageUrl", product.ImageUrl);
                 paramaters.Add("@imageList", product.ImageList);
                 paramaters.Add("@language", CultureInfo.CurrentCulture.Name);
+                paramaters.Add("@categoryIds", product.CategoryIds);
                 string editProduct = "Edit_Product";
                 await conn.ExecuteAsync(editProduct, paramaters, null, null, System.Data.CommandType.StoredProcedure);
                 return NoContent();

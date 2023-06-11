@@ -1,6 +1,6 @@
 ﻿USE [RestApiAdapper]
 GO
-/****** Object:  StoredProcedure [dbo].[Get_Product_All_Paging]    Script Date: 10/6/2023 6:44:38 PM ******/
+/****** Object:  StoredProcedure [dbo].[Get_Product_All_Paging]    Script Date: 11/6/2023 8:54:54 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -26,8 +26,11 @@ BEGIN
 	SELECT @totalRow = COUNT(*) 
 	FROM Products p INNER JOIN ProductTranslations pt
 	ON p.Id = pt.ProductId
-	WHERE (Sku like @keyword + '%' or @keyword is null) and IsActive = 1
+	LEFT JOIN ProductInCategories pic ON p.id = pic.ProductId
+	LEFT JOIN Categories c ON  c.Id =pic.CategoryId
+	WHERE (Sku like @keyword + '%' or @keyword is null) and p.IsActive = 1
 	and pt.LanguageId = @language
+	and pic.CategoryId = @categoryId
 
 	SELECT p.Id, 
 		p.Sku,
@@ -44,11 +47,15 @@ BEGIN
 		pt.SeoAlias,
 		pt.SeoKeyword,
 		pt.SeoTitle,
-		pt.LanguageId
+		pt.LanguageId,
+		c.Name as CategoryName
 	FROM Products p INNER JOIN ProductTranslations pt 
 	ON p.Id = pt.ProductId
+	LEFT JOIN ProductInCategories pic ON p.id = pic.ProductId
+	LEFT JOIN Categories c ON  c.Id =pic.CategoryId
 	WHERE (@keyword is null or Sku like @keyword + '%') and p.IsActive =1
 	and pt.LanguageId = @language
+	and pic.CategoryId = @categoryId
 	ORDER BY p.CreatedAt desc
 	offset (@pageIndex -1) * @pageSize rows
 	fetch next @pageSize row only
