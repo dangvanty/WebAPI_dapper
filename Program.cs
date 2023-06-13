@@ -1,16 +1,19 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json;
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Reflection;
 using WebAPI_dapper.Resources;
 using Microsoft.Extensions.Options;
+using WebAPI_dapper.Models;
+using System.Data.SqlClient;
+using WebAPI_dapper.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +26,25 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
 });
 
+// tich hop identity
+
+builder.Services.AddTransient<IUserStore<AppUser>,UserStore>();
+builder.Services.AddTransient<IRoleStore<AppRole>, RoleStore>();
+
+
+builder.Services.AddIdentity<AppUser, AppRole>()
+        .AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(opt =>
+{
+    opt.Password.RequireDigit= true;
+    opt.Password.RequireLowercase= false;
+    opt.Password.RequireUppercase= false;
+    opt.Password.RequireNonAlphanumeric= false;
+    opt.Password.RequiredUniqueChars= 1;
+    opt.Password.RequiredLength= 6;
+
+});
 // tich hop da ngon ngu
 
 var supportedCultures = new[]
@@ -74,9 +96,9 @@ var loggerFactory = app.Services.GetService<ILoggerFactory>();
 var locOptions = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
 app.UseRequestLocalization(locOptions.Value);
 
-app.UseExceptionHandler(options =>
+app.UseExceptionHandler(opt =>
 {
-    options.Run(async context =>
+    opt.Run(async context =>
     {
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
@@ -91,11 +113,13 @@ app.UseExceptionHandler(options =>
         context.Response.Headers.Add("Access-Control-Allow-Credentials", new[] { "true" });
         context.Response.Headers.Add("Access-Control-Allow-Origin", new[] { builder.Configuration["AllowedHosts"] });
 
-        using (var writer = new StreamWriter(context.Response.Body))
-        {
-            new Newtonsoft.Json.JsonSerializer().Serialize(writer, error);
-            await writer.FlushAsync().ConfigureAwait(false);
-        }
+        //using (var writer = new StreamWriter(context.Response.Body))
+        //{
+        //    new JsonSerializer().Serialize(writer, error);
+        //    await writer.FlushAsync().ConfigureAwait(false);
+        //}
+        await context.Response.WriteAsJsonAsync(error);
+
     });
 });
 
