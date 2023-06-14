@@ -120,4 +120,7 @@
   <data name="ForgotPassword" xml:space="preserve">
     <value>Quên mật khẩu</value>
   </data>
+  <data name="RequiredMsg" xml:space="preserve">
+    <value>{0} bắt buộc nhập</value>
+  </data>
 </root>

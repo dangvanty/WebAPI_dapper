@@ -1,10 +1,15 @@
-﻿namespace WebAPI_dapper.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebAPI_dapper.Models
 {
     public class AppUser
     {
         public  Guid Id { get; set; }
+
         public string UserName { get; set; }
         public string NormalizedUserName { get; set; }
+
+        [Required(ErrorMessage = "RequiredMsg")]
         public string Email { get; set; }
         public string NormalizedEmail { get; set; }
         public bool EmailConfirmed { get; set; }  
