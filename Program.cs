@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
@@ -14,6 +14,8 @@ using Microsoft.Extensions.Options;
 using WebAPI_dapper.Models;
 using System.Data.SqlClient;
 using WebAPI_dapper.Data;
+using System.ComponentModel;
+using Swashbuckle.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,12 @@ builder.Services.Configure<IdentityOptions>(opt =>
     opt.Password.RequireNonAlphanumeric= false;
     opt.Password.RequiredUniqueChars= 1;
     opt.Password.RequiredLength= 6;
+
+
+    // Cấu hình Lockout -khóa user
+    opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); // Khóa 5 phút
+    opt.Lockout.MaxFailedAccessAttempts = 5; // Thất bại 5 lầ thì khóa
+    opt.Lockout.AllowedForNewUsers = true;
 
 });
 // tich hop da ngon ngu
@@ -126,7 +134,18 @@ app.UseExceptionHandler(opt =>
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger(c =>
+    {
+        c.PreSerializeFilters.Add((document, request) =>
+        {
+            var paths = document.Paths.ToDictionary(item => item.Key.ToLowerInvariant(), item => item.Value);
+            document.Paths.Clear();
+            foreach (var pathItem in paths)
+            {
+                document.Paths.Add(pathItem.Key, pathItem.Value);
+            }
+        });
+    });
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json","Learn WebAPI_dapper v1");
