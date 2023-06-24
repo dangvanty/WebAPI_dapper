@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
 using System.Reflection.Metadata;
 using WebAPI_dapper.Dtos;
+using WebAPI_dapper.Filters;
 using WebAPI_dapper.Helpers;
 using WebAPI_dapper.Models;
 
@@ -85,6 +86,7 @@ namespace WebAPI_dapper.Controllers
         }
 
         [HttpGet]
+        [ClaimRequirement(FunctionCode.SYSTEM_USER,ActionCode.VIEW)]
         public async Task<IActionResult> Get()
         {
             using(var conn = new SqlConnection(_connectString))

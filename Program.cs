@@ -16,6 +16,7 @@ using System.Data.SqlClient;
 using WebAPI_dapper.Data;
 using System.ComponentModel;
 using Swashbuckle.Swagger;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,7 +94,34 @@ builder.Services.AddMvc()
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(option =>
+{
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
+
 
 var app = builder.Build();
 var loggerFactory = app.Services.GetService<ILoggerFactory>();
@@ -134,18 +162,7 @@ app.UseExceptionHandler(opt =>
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger(c =>
-    {
-        c.PreSerializeFilters.Add((document, request) =>
-        {
-            var paths = document.Paths.ToDictionary(item => item.Key.ToLowerInvariant(), item => item.Value);
-            document.Paths.Clear();
-            foreach (var pathItem in paths)
-            {
-                document.Paths.Add(pathItem.Key, pathItem.Value);
-            }
-        });
-    });
+    app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json","Learn WebAPI_dapper v1");

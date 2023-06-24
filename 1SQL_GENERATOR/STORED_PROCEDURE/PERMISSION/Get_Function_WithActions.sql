@@ -1,35 +1,32 @@
 ﻿USE [RestApiAdapper]
 GO
-/****** Object:  StoredProcedure [dbo].[GET_ALL_FUNCTION]    Script Date: 15/6/2023 1:18:35 PM ******/
+/****** Object:  StoredProcedure [dbo].[Create_Product]    Script Date: 15/6/2023 5:22:23 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 -- =============================================
--- Author:		<tydang,tydang>
--- Create date: <15/06/2023>
--- Description:	<GET_ALL_FUNCTION>
+-- Author:		dangvanty
+-- Create date: 15/6/2023
+-- Description:	[Get_Function_WithActions] 
 -- =============================================
-CREATE PROCEDURE [dbo].[Get_Function_ByPermission] 
-@userId varchar(50)
+CREATE PROCEDURE [dbo].[Get_Function_WithActions]
 AS
 BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- không trả về số dòng affect
 	SET NOCOUNT ON;
-
- select 
-		f.Id,
-		f.Name,
-		f.Url,
-		f.ParentId,
-		f.IsActive,
-		f.SortOrder,
-		f.CssClass
-	 from Functions f
-	join Permissions p on f.Id = p.FunctionId
-	join AspNetRoles r on p.RoleId = r.Id
-	join Actions a on p.ActionId = a.Id
-	join AspNetUserRoles ur on r.Id = ur.RoleId
-	where ur.UserId = @userId and a.Id ='VIEW'
+	SELECT 
+			f.Id,
+			f.Name,
+			f.ParentId,
+			case when sum(case when a.Id='CREATE' then 1 else 0 end)>0 then 1 else 0 end as HasCreated,
+			case when sum(case when a.Id='UPDATE' then 1 else 0 end)>0 then 1 else 0 end as HasUpdate,
+			case when sum(case when a.Id='DELETE' then 1 else 0 end)>0 then 1 else 0 end as HasDelete,
+			case when sum(case when a.Id='VIEW' then 1 else 0 end)>0 then 1 else 0 end as HasView,
+			case when sum(case when a.Id='IMPORT' then 1 else 0 end)>0 then 1 else 0 end as HasImport,
+			case when sum(case when a.Id='EXPORT' then 1 else 0 end)>0 then 1 else 0 end as HasExport,
+			case when sum(case when a.Id='APPROVE' then 1 else 0 end)>0 then 1 else 0 end as HasApprove
+		from Functions f
+			left join ActionInFunctions aif on f.Id = aif.FunctionId
+			left join Actions a on aif.ActionId = a.Id
+	    group by f.Id,f.Name,f.ParentId
 END
