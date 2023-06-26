@@ -11,8 +11,8 @@ using System.Text;
 using WebAPI_dapper.Constants;
 using WebAPI_dapper.Extensions;
 using WebAPI_dapper.Helpers;
-using WebAPI_dapper.Models;
-using WebAPI_dapper.ViewModel;
+using WebAPI_dapper.Data.Models;
+using WebAPI_dapper.Data.ViewModel;
 
 
 namespace WebAPI_dapper.Controllers

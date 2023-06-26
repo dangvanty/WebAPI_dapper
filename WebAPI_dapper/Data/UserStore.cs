@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Identity;
 using System.Data.SqlClient;
-using WebAPI_dapper.Models;
+using WebAPI_dapper.Data.Models;
 
 namespace WebAPI_dapper.Data
 {

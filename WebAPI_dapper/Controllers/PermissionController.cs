@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Data;
-using WebAPI_dapper.ViewModel;
+using WebAPI_dapper.Data.ViewModel;
 using WebAPI_dapper.Extensions;
 
 namespace WebAPI_dapper.Controllers

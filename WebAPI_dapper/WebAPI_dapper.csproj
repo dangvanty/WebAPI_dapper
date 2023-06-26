@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Dapper" Version="2.0.143" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
@@ -18,6 +18,11 @@
 
   <ItemGroup>
     <Folder Include="Logs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebAPI_dapper.Data\WebAPI_dapper.Data.csproj" />
+    <ProjectReference Include="..\WebAPI_dapper.Utilities\WebAPI_dapper.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

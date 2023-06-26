@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33712.159
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI_dapper", "WebAPI_dapper.csproj", "{4BA1313C-C877-4C56-966D-F00762B5E222}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI_dapper.Data", "WebAPI_dapper.Data\WebAPI_dapper.Data.csproj", "{132F469D-69B4-4471-9123-8E58E439DE6E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI_dapper.Utilities", "WebAPI_dapper.Utilities\WebAPI_dapper.Utilities.csproj", "{9CF3576B-F008-4B07-93FF-88FA56FCF521}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI_dapper", "WebAPI_dapper\WebAPI_dapper.csproj", "{36F79766-5753-4774-838D-2FA2913C3320}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4BA1313C-C877-4C56-966D-F00762B5E222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4BA1313C-C877-4C56-966D-F00762B5E222}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4BA1313C-C877-4C56-966D-F00762B5E222}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4BA1313C-C877-4C56-966D-F00762B5E222}.Release|Any CPU.Build.0 = Release|Any CPU
+		{132F469D-69B4-4471-9123-8E58E439DE6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{132F469D-69B4-4471-9123-8E58E439DE6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{132F469D-69B4-4471-9123-8E58E439DE6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{132F469D-69B4-4471-9123-8E58E439DE6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CF3576B-F008-4B07-93FF-88FA56FCF521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CF3576B-F008-4B07-93FF-88FA56FCF521}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CF3576B-F008-4B07-93FF-88FA56FCF521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CF3576B-F008-4B07-93FF-88FA56FCF521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36F79766-5753-4774-838D-2FA2913C3320}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36F79766-5753-4774-838D-2FA2913C3320}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36F79766-5753-4774-838D-2FA2913C3320}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36F79766-5753-4774-838D-2FA2913C3320}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

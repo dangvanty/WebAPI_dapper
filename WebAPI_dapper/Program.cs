@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using System.Reflection;
 using WebAPI_dapper.Resources;
 using Microsoft.Extensions.Options;
-using WebAPI_dapper.Models;
+using WebAPI_dapper.Data.Models;
 using System.Data.SqlClient;
 using WebAPI_dapper.Data;
 using System.ComponentModel;

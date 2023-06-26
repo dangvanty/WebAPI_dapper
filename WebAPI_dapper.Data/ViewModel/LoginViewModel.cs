@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebAPI_dapper.ViewModel
+namespace WebAPI_dapper.Data.ViewModel
 {
     public class LoginViewModel
     {

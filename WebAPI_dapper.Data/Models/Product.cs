@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebAPI_dapper.Models
+namespace WebAPI_dapper.Data.Models
 {
     public class Product
     {

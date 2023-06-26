@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
 using System.Reflection.Metadata;
-using WebAPI_dapper.Dtos;
+using WebAPI_dapper.Utilities.Dtos;
 using WebAPI_dapper.Filters;
 using WebAPI_dapper.Helpers;
-using WebAPI_dapper.Models;
+using WebAPI_dapper.Data.Models;
 
 namespace WebAPI_dapper.Controllers
 {

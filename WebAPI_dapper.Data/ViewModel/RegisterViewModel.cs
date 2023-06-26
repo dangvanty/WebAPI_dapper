@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 
-namespace WebAPI_dapper.ViewModel
+namespace WebAPI_dapper.Data.ViewModel
 {
     public class RegisterViewModel
     {

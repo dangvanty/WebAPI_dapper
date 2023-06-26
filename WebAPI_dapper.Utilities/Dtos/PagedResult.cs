@@ -1,6 +1,5 @@
-﻿using WebAPI_dapper.Models;
-
-namespace WebAPI_dapper.Dtos
+﻿
+namespace WebAPI_dapper.Utilities.Dtos
 {
     public class PagedResult<T>
     {

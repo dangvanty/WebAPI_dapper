@@ -1,47 +1,28 @@
 ﻿using Dapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Globalization;
-using System.Xml.Linq;
-using WebAPI_dapper.Dtos;
-using WebAPI_dapper.Extensions;
-using WebAPI_dapper.Helpers;
-using WebAPI_dapper.Models;
-using WebAPI_dapper.Resources;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using WebAPI_dapper.Data.Models;
+using WebAPI_dapper.Utilities.Dtos;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
-namespace WebAPI_dapper.Controllers
+namespace WebAPI_dapper.Data.Responsitories
 {
-    [Route("api/{culture}/[controller]")]
-    [ApiController]
-    [MiddlewareFilter(typeof(LocalizationPipeline))]
-    public class ProductController : ControllerBase
+    public class ProductResponsitory
     {
         private readonly string _connectString;
-        private readonly ILogger<ProductController> _logger;
-        private readonly IStringLocalizer<ProductController> _localizer;
-        private readonly LocalService _localService;
-        public ProductController(IConfiguration configuration, ILogger<ProductController> logger, IStringLocalizer<ProductController> localizer, LocalService localService)
+        public ProductResponsitory(IConfiguration configuration)
         {
-
             _connectString = configuration.GetConnectionString("DBSQLServer");
-            _logger = logger;
-            _localizer = localizer;
-            _localService = localService;
         }
-
-        // GET: api/<ProductController>
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IEnumerable<Product>> GetAllAsync(string culture)
         {
-
-            //string text = _localizer["dog"];
-            //string text1 = _localService.GetLocalizedHtmlString("ForgotPassword");
-            //_logger.LogError("Test product controller");
-
-
             using (var conn = new SqlConnection(_connectString))
             {
                 if (conn.State == System.Data.ConnectionState.Closed)
@@ -51,23 +32,15 @@ namespace WebAPI_dapper.Controllers
                 //                            from Products";
 
                 var paramaters = new DynamicParameters();
-                paramaters.Add("@language", CultureInfo.CurrentCulture.Name);
+                paramaters.Add("@language", culture);
                 string storedSelectAllPro = "Get_Product_All";
-                
+
                 var result = await conn.QueryAsync<Product>(storedSelectAllPro, paramaters, null, null, System.Data.CommandType.StoredProcedure);
 
-                return Ok(new ApiResponse
-                {
-                    Data = result,
-                    Message = "Success for getting all",
-                    Success = true
-                });
+                return result;
             }
         }
-
-        // GET api/<ProductController>/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<Product> GetByIdAsync (int id, string culture)
         {
             using (var conn = new SqlConnection(_connectString))
             {
@@ -76,22 +49,16 @@ namespace WebAPI_dapper.Controllers
 
                 var paramaters = new DynamicParameters();
                 paramaters.Add("@id", id);
-                paramaters.Add("@language", CultureInfo.CurrentCulture.Name);
+                paramaters.Add("@language", culture);
 
                 string storedFindProById = "Find_Product_By_Id";
                 var result = await conn.QueryAsync<Product>(storedFindProById, paramaters, null, null, System.Data.CommandType.StoredProcedure);
-                return Ok(new ApiResponse
-                {
-                    Message = $"Find Product by ID ={id} ",
-                    Success = true,
-                    Data = result.Single()
-                });
+                
+                return result.Single();
 
             }
         }
-
-        [HttpGet("Paging", Name = "GetPagging")]
-        public async Task<PagedResult<Product>> GetPagging(string? keyword, int categoryId, int pageIndex, int pageSize)
+        public async Task<PagedResult<Product>> GetPaggingAsync(string? keyword, int categoryId, int pageIndex, int pageSize,string culture)
         {
             using (var conn = new SqlConnection(_connectString))
             {
@@ -104,7 +71,7 @@ namespace WebAPI_dapper.Controllers
 
                 paramaters.Add("@pageIndex", pageIndex);
                 paramaters.Add("@pageSize", pageSize);
-                paramaters.Add("@language", CultureInfo.CurrentCulture.Name);
+                paramaters.Add("@language", culture);
                 paramaters.Add("@totalRow", dbType: System.Data.DbType.Int32, direction: System.Data.ParameterDirection.Output);
 
                 string GetProductPaging = "Get_Product_All_Paging";
@@ -120,11 +87,7 @@ namespace WebAPI_dapper.Controllers
                 return pageResult;
             }
         }
-
-        // POST api/<ProductController>
-        [HttpPost]
-        [ValidateModel]
-        public async Task<IActionResult> Post([FromBody] Product product)
+        public async Task<int> CreateAsync(Product product, string culture)
         {
             int newId = 0;
             using (var conn = new SqlConnection(_connectString))
@@ -145,7 +108,7 @@ namespace WebAPI_dapper.Controllers
                 paramaters.Add("@isActice", product.IsActive);
                 paramaters.Add("@imageUrl", product.ImageUrl);
                 paramaters.Add("@imageList", product.ImageList);
-                paramaters.Add("@language", CultureInfo.CurrentCulture.Name);
+                paramaters.Add("@language", culture);
                 paramaters.Add("@categoryIds", product.CategoryIds);
                 paramaters.Add("@id", dbType: System.Data.DbType.Int32, direction: System.Data.ParameterDirection.Output);
 
@@ -156,18 +119,9 @@ namespace WebAPI_dapper.Controllers
                 newId = paramaters.Get<int>("@id");
 
             }
-            return Ok(new ApiResponse
-            {
-                Message = "Created success",
-                Success = true,
-                Data = $"Product id {newId} was created!"
-            });
+            return newId;
         }
-
-        // PUT api/<ProductController>/5
-        [HttpPut("{id}")]
-
-        public async Task<IActionResult> Put(int id, [FromBody] Product product)
+        public async Task EditAsync(int id, Product product, string culture)
         {
             using (var conn = new SqlConnection(_connectString))
             {
@@ -187,19 +141,13 @@ namespace WebAPI_dapper.Controllers
                 paramaters.Add("@isActice", product.IsActive);
                 paramaters.Add("@imageUrl", product.ImageUrl);
                 paramaters.Add("@imageList", product.ImageList);
-                paramaters.Add("@language", CultureInfo.CurrentCulture.Name);
+                paramaters.Add("@language", culture);
                 paramaters.Add("@categoryIds", product.CategoryIds);
                 string editProduct = "Edit_Product";
                 await conn.ExecuteAsync(editProduct, paramaters, null, null, System.Data.CommandType.StoredProcedure);
-                return NoContent();
-
             }
-
         }
-
-        // DELETE api/<ProductController>/5
-        [HttpDelete("{id}")]
-        public async Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             using (var conn = new SqlConnection(_connectString))
             {
@@ -213,6 +161,43 @@ namespace WebAPI_dapper.Controllers
                 await conn.ExecuteAsync(deleteProduct, paramaters, null, null, System.Data.CommandType.StoredProcedure);
 
             }
+        }
+        public async Task<List<int>> CreateManyAsync(List<Product> products,string culture)
+        {
+            List<int> ids = new List<int>();
+            using (var conn = new SqlConnection(_connectString))
+            {
+                if (conn.State == System.Data.ConnectionState.Closed)
+                    conn.Open();
+                foreach (var product in products)
+                {
+
+
+                    var paramaters = new DynamicParameters();
+                    paramaters.Add("@name", product.Name);
+                    paramaters.Add("@seoDescription", product.SeoDescription);
+                    paramaters.Add("@description", product.Description);
+                    paramaters.Add("@content", product.Content);
+                    paramaters.Add("@seoAlias", product.SeoAlias);
+                    paramaters.Add("@seoTitle", product.SeoTitle);
+                    paramaters.Add("@seoKeyword", product.SeoKeyword);
+                    paramaters.Add("@sku", product.Sku);
+                    paramaters.Add("@price", product.Price);
+                    paramaters.Add("@isActice", product.IsActive);
+                    paramaters.Add("@imageUrl", product.ImageUrl);
+                    paramaters.Add("@imageList", product.ImageList);
+                    paramaters.Add("@language", culture);
+                    paramaters.Add("@categoryIds", product.CategoryIds);
+                    paramaters.Add("@id", dbType: System.Data.DbType.Int32, direction: System.Data.ParameterDirection.Output);
+
+                    string createProduct = "Create_Product";
+                    var result= await conn.ExecuteAsync(createProduct, paramaters, null, null, System.Data.CommandType.StoredProcedure);
+
+
+                    ids.Add(paramaters.Get<int>("@id"));
+                }
+            }
+            return ids;
         }
     }
 }
