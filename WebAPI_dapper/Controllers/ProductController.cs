@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System.Data.SqlClient;
 using System.Globalization;
+using WebAPI_dapper.Data.Interfaces;
 using WebAPI_dapper.Data.Models;
 using WebAPI_dapper.Data.Responsitories;
 using WebAPI_dapper.Extensions;
@@ -22,15 +23,21 @@ namespace WebAPI_dapper.Controllers
         private readonly ILogger<ProductController> _logger;
         private readonly IStringLocalizer<ProductController> _localizer;
         private readonly LocalService _localService;
-        private readonly ProductResponsitory _productResponsitory;
-        public ProductController(IConfiguration configuration, ILogger<ProductController> logger, IStringLocalizer<ProductController> localizer, LocalService localService)
+        private readonly IProductResponsitory _productResponsitory;
+        public ProductController(
+            IConfiguration configuration, 
+            ILogger<ProductController> logger, 
+            IStringLocalizer<ProductController> localizer, 
+            LocalService localService,
+            IProductResponsitory productResponsitory
+            )
         {
 
             _connectString = configuration.GetConnectionString("DBSQLServer");
             _logger = logger;
             _localizer = localizer;
             _localService = localService;
-            _productResponsitory = new ProductResponsitory(configuration);
+            _productResponsitory = productResponsitory;
         }
 
         // GET: api/<ProductController>

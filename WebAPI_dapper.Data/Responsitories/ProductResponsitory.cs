@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Globalization;
@@ -9,12 +10,13 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using WebAPI_dapper.Data.Interfaces;
 using WebAPI_dapper.Data.Models;
 using WebAPI_dapper.Utilities.Dtos;
 
 namespace WebAPI_dapper.Data.Responsitories
 {
-    public class ProductResponsitory
+    public class ProductResponsitory : IProductResponsitory
     {
         private readonly string _connectString;
         public ProductResponsitory(IConfiguration configuration)

@@ -1,8 +1,8 @@
 ﻿using Dapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
 using System.Data;
+using System.Data.SqlClient;
+using WebAPI_dapper.Data.Interfaces;
 using WebAPI_dapper.Data.ViewModel;
 using WebAPI_dapper.Extensions;
 
@@ -12,79 +12,40 @@ namespace WebAPI_dapper.Controllers
     [ApiController]
     public class PermissionController : ControllerBase
     {
-        private readonly string _connectionString;
-        public PermissionController(IConfiguration configuration)
+        private readonly IPermissionResponsitory _permissionResponsitory;
+        public PermissionController(IPermissionResponsitory permissionResponsitory)
         {
-            _connectionString = configuration.GetConnectionString("DBSQLServer");
+            _permissionResponsitory = permissionResponsitory;
         }
         [HttpGet("function-actions")]
         public async Task<IActionResult> GetAllWithPermission()
         {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                if (conn.State == ConnectionState.Closed)
-                    await conn.OpenAsync();
+            var result = await _permissionResponsitory.GetAllWithPermission();
+            return Ok(result);
 
-                var result = await conn.QueryAsync<FunctionActionViewModel>("Get_Function_WithActions", null, null, null, System.Data.CommandType.StoredProcedure);
-
-                return Ok(result);
-            }
         }
 
         [HttpGet("{role}/role-permissions")]
         public async Task<IActionResult> GetAllRolePermissions(Guid? role)
         {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                if (conn.State == ConnectionState.Closed)
-                    conn.Open();
-
-                var paramaters = new DynamicParameters();
-                paramaters.Add("@roleId", role);
-
-                var result = await conn.QueryAsync<PermissionViewModel>("Get_Permission_ByRoleId", paramaters, null, null, System.Data.CommandType.StoredProcedure);
-                return Ok(result);
-            }
+            var result = await _permissionResponsitory.GetAllRolePermissions(role);
+            return Ok(result);
+            
         }
 
         [HttpPost("{role}/save-permissions")]
         public async Task<IActionResult> SavePermissions(Guid role, [FromBody] List<PermissionViewModel> permissions)
         {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                if (conn.State == ConnectionState.Closed)
-                    conn.Open();
-
-                var dt = new DataTable();
-                dt.Columns.Add("RoleId", typeof(Guid));
-                dt.Columns.Add("FunctionId", typeof(string));
-                dt.Columns.Add("ActionId", typeof(string));
-                foreach (var item in permissions)
-                {
-                    dt.Rows.Add(role, item.FunctionId, item.ActionId);
-                }
-                var paramaters = new DynamicParameters();
-                paramaters.Add("@roleId", role);
-                paramaters.Add("@permissions", dt.AsTableValuedParameter("dbo.Permission"));
-                await conn.ExecuteAsync("Create_Permission", paramaters, null, null, System.Data.CommandType.StoredProcedure);
-                return Ok();
-            }
+            await _permissionResponsitory.SavePermissions(role, permissions);
+            return Ok();
+          
         }
 
         [HttpGet("functions-view")]
         public async Task<IActionResult> GetAllFunctionByPermission()
         {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                if (conn.State == ConnectionState.Closed)
-                    conn.Open();
-
-                var paramaters = new DynamicParameters();
-                paramaters.Add("@userId", User.GetUserId());
-
-                var result = await conn.QueryAsync<FunctionViewModel>("Get_Function_ByPermission", paramaters, null, null, System.Data.CommandType.StoredProcedure);
-                return Ok(result);
-            }
+            var result = await _permissionResponsitory.GetAllFunctionByPermission(User.GetUserId());
+            return Ok(result);
         }
     }
 }

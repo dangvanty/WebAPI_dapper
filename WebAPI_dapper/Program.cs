@@ -17,6 +17,8 @@ using WebAPI_dapper.Data;
 using System.ComponentModel;
 using Swashbuckle.Swagger;
 using Microsoft.OpenApi.Models;
+using WebAPI_dapper.Data.Interfaces;
+using WebAPI_dapper.Data.Responsitories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +35,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 builder.Services.AddTransient<IUserStore<AppUser>,UserStore>();
 builder.Services.AddTransient<IRoleStore<AppRole>, RoleStore>();
+
+builder.Services.AddTransient<IProductResponsitory, ProductResponsitory>();
+builder.Services.AddTransient<IFunctionResponsitory, FunctionResponsitory>();
+builder.Services.AddTransient<IPermissionResponsitory,PermissionResponsitory>();
 
 
 builder.Services.AddIdentity<AppUser, AppRole>()
