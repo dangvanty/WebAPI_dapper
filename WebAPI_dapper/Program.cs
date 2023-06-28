@@ -39,6 +39,7 @@ builder.Services.AddTransient<IRoleStore<AppRole>, RoleStore>();
 builder.Services.AddTransient<IProductResponsitory, ProductResponsitory>();
 builder.Services.AddTransient<IFunctionResponsitory, FunctionResponsitory>();
 builder.Services.AddTransient<IPermissionResponsitory,PermissionResponsitory>();
+builder.Services.AddTransient<IAttributeRepository, AttributeRepository>();
 
 
 builder.Services.AddIdentity<AppUser, AppRole>()
