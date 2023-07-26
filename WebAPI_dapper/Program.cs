@@ -161,6 +161,12 @@ app.UseExceptionHandler(opt =>
         //    new JsonSerializer().Serialize(writer, error);
         //    await writer.FlushAsync().ConfigureAwait(false);
         //}
+// using ( writer = new StreamWriter(context.Response.Body))
+// {
+//  var json = JsonSerializer.Serialize(error);
+//     await writer.WriteAsync(json);
+//  await writer.FlushAsync().ConfigureAwait(false);
+// }
         await context.Response.WriteAsJsonAsync(error);
 
     });
